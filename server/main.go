@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 type Todo struct {
@@ -23,7 +24,9 @@ func main() {
 
 	router.HandleFunc("/todo/{id}", getTodoHandler).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	handler := cors.AllowAll().Handler(router)
+
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }
 
 func pingHandler(w http.ResponseWriter, r *http.Request) {
