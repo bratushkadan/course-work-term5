@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	tokenSec = "5bdb9986-2cbe-4e5e-a8b6-293e3ca9"
-	username = "$cool_username"
+	tokenSecJwt = "5bdb9986-2cbe-4e5e-a8b6-2293e3ca9"
+	username    = "$cool_username"
 )
 
 func TestJWTMaker(t *testing.T) {
@@ -18,7 +18,7 @@ func TestJWTMaker(t *testing.T) {
 	issuedAt := time.Now()
 	expiresAt := issuedAt.Add(duration)
 
-	maker, _ := NewJWTMaker(tokenSec)
+	maker, _ := NewJWTMaker(tokenSecJwt)
 	token, _ := maker.CreateToken(username, duration)
 
 	// act
@@ -37,7 +37,7 @@ func TestJWTMaker(t *testing.T) {
 
 func TestExpiredJWT(t *testing.T) {
 	// arrange
-	maker, _ := NewJWTMaker(tokenSec)
+	maker, _ := NewJWTMaker(tokenSecJwt)
 	token, _ := maker.CreateToken("bratushkadan", -1*time.Minute)
 
 	// act

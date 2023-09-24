@@ -1,18 +1,41 @@
 package auth
 
 import (
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"golang.org/x/crypto/chacha20poly1305"
 )
+
+const (
+	tokenSecPaseto = "5bdb9986-2cbe-4e5e-a8b6-293e3ca9"
+)
+
+func TestPasetoMakerNot32CharLenSec(t *testing.T) {
+	// arrange
+	const myCoolSecret = "dark brandon"
+
+	// act
+	maker, err := NewPasetoMaker(myCoolSecret)
+
+	// assert
+	// key of len() != 32 is not possible for Paseto implementation of Maker
+	if !errors.Is(err, ErrInvalidKeySize) {
+		t.Error(err)
+	}
+	if maker != nil {
+		t.Errorf("maker shouldn't be created when provided secret length is not of length %d", chacha20poly1305.KeySize)
+	}
+}
 
 func TestPasetoMaker(t *testing.T) {
 	// arrange
 	var maker Maker
-	maker, _ = NewPasetoMaker(tokenSec)
+	maker, _ = NewPasetoMaker(tokenSecPaseto)
 
-	username := "bratushakdan"
+	username := "vladislav"
 	duration := time.Minute
 
 	issuedAt := time.Now()
@@ -37,7 +60,7 @@ func TestPasetoMaker(t *testing.T) {
 func TestExpiredPasetoToken(t *testing.T) {
 	// arrange
 	var maker Maker
-	maker, _ = NewJWTMaker(tokenSec)
+	maker, _ = NewJWTMaker(tokenSecPaseto)
 
 	// act
 	var token string

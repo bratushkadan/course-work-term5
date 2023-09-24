@@ -14,6 +14,8 @@ import (
 	"floral/auth"
 	"floral/database"
 
+	"floral/internal/app"
+
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -22,6 +24,28 @@ import (
 type Todo struct {
 	ID   int    `json:"id"`
 	Text string `json:"text"`
+}
+
+type Foo interface {
+	fmt.Stringer
+}
+
+type Bar struct {
+	FirstName string
+	LastName  string
+}
+
+func (b *Bar) String() string {
+	return fmt.Sprintf("%s %s", b.FirstName, b.LastName)
+}
+
+func init() {
+	b := &Bar{FirstName: "Dan", LastName: "Bratushka"}
+	foobar(b)
+}
+
+func foobar(foo Foo) string {
+	return foo.String()
 }
 
 var tokenSecret = os.Getenv("TOKEN_SECRET")
@@ -45,6 +69,8 @@ func init() {
 }
 
 func main() {
+	_ = app.InitApp()
+
 	router := mux.NewRouter()
 
 	router.Use(jsonRespMiddleware)
