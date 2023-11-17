@@ -1,24 +1,20 @@
 package main
 
 import (
-	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
-	"net/http"
-	"strconv"
 	"time"
 
 	"floral/config"
-	"floral/generated/database"
 
-	"floral/internal/app"
+	api "floral/generated/api"
+
+	apiImpl "floral/internal/api"
 	"floral/internal/auth"
 
-	"github.com/google/uuid"
-	"github.com/gorilla/mux"
-	"github.com/rs/cors"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 type Todo struct {
@@ -50,97 +46,13 @@ func init() {
 }
 
 func main() {
-	_ = app.InitApp()
+	var floralApi = &apiImpl.Impl{}
 
-	router := mux.NewRouter()
+	r := gin.Default()
+	r.Use(cors.Default())
+	api.RegisterHandlers(r, floralApi)
 
-	router.Use(jsonRespMiddleware)
-
-	v1Router := router.PathPrefix("/v1").Subrouter()
-
-	v1Auth := v1Router.PathPrefix("/auth").Subrouter()
-
-	v1Auth.HandleFunc("/token", v1AuthTokenHandler).Methods("GET")
-	v1Auth.HandleFunc("/token/verify", v1AuthTokenVerifyHandler).Methods("POST")
-
-	v1User := v1Router.PathPrefix("/user").Subrouter()
-
-	usersHandler := func(w http.ResponseWriter, r *http.Request) {
-		users, err := GetUsers()
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`[]`))
-			return
-		}
-		if users == nil {
-			users = []database.FloralUser{}
-		}
-		json.NewEncoder(w).Encode(users)
-	}
-	v1User.HandleFunc("", usersHandler).Methods("GET")
-	v1User.HandleFunc("/", usersHandler).Methods("GET")
-	v1User.HandleFunc("/{id:[0-9]+}", func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id, err := strconv.Atoi(vars["id"])
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(struct {
-				Error string `json:"error"`
-			}{Error: `query parameter "id" has to be of type int32.`})
-		}
-		user, err := GetUser(int32(id))
-		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				w.WriteHeader(http.StatusNotFound)
-			} else {
-				w.WriteHeader(http.StatusInternalServerError)
-			}
-			w.Write([]byte(`[]`))
-			return
-		}
-		json.NewEncoder(w).Encode(user)
-	})
-
-	router.HandleFunc("/ping", pingHandler).Methods("GET")
-
-	router.HandleFunc("/todo/{id}", getTodoHandler).Methods("GET")
-
-	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{error: "handler for route not found"}`))
-	})
-
-	handler := cors.AllowAll().Handler(router)
-
-	log.Fatal(http.ListenAndServe(":8080", handler))
-}
-
-func pingHandler(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(struct {
-		Ts int64 `json:"ts"`
-	}{
-		Ts: time.Now().UnixMilli(),
-	})
-}
-
-func getTodoHandler(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	id, err := strconv.Atoi(params["id"])
-	w.Header().Set("Content-Type", "application/json")
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"error": Invalid ID}`))
-		// http.Error(w, , http.StatusBadRequest)
-		return
-	}
-
-	todo := Todo{
-		ID:   id,
-		Text: uuid.NewString(),
-	}
-
-	json.NewEncoder(w).Encode(todo)
+	r.Run()
 }
 
 var (
@@ -153,61 +65,80 @@ type ErrResponse struct {
 	Errors []string `json:"errors"`
 }
 
-func v1AuthTokenHandler(w http.ResponseWriter, r *http.Request) {
-	params := r.URL.Query()
-	errs := []error{}
-	username, password := params.Get("username"), params.Get("password")
-	if username == "" {
-		errs = append(errs, ErrAuthUsernameNotProvided)
-	}
-	if password == "" {
-		errs = append(errs, ErrAuthPasswordNotProvided)
-	}
-	if len(errs) > 0 {
-		respondErrors(w, errs)
-		return
-	}
+// func getTodoHandler(w http.ResponseWriter, r *http.Request) {
+// 	params := mux.Vars(r)
+// 	id, err := strconv.Atoi(params["id"])
+// 	w.Header().Set("Content-Type", "application/json")
+// 	if err != nil {
+// 		w.WriteHeader(http.StatusBadRequest)
+// 		w.Write([]byte(`{"error": Invalid ID}`))
+// 		// http.Error(w, , http.StatusBadRequest)
+// 		return
+// 	}
 
-	token, err := tokenMaker.CreateToken(username, TokenDuration)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(ErrInternalServerErrorJson))
-		return
-	}
-	json.NewEncoder(w).Encode(struct {
-		Token string `json:"token"`
-	}{Token: token})
-}
-func v1AuthTokenVerifyHandler(w http.ResponseWriter, r *http.Request) {
-	params := r.URL.Query()
-	errs := []error{}
-	token := params.Get("auth_token")
-	if token == "" {
-		errs = append(errs, ErrAuthTokenNotProvided)
-	}
-	if len(errs) > 0 {
-		respondErrors(w, errs)
-		return
-	}
+// 	todo := Todo{
+// 		ID:   id,
+// 		Text: uuid.NewString(),
+// 	}
 
-	_, err := tokenMaker.VerifyToken(token)
-	json.NewEncoder(w).Encode(struct {
-		IsValid bool `json:"is_valid"`
-	}{IsValid: err == nil})
-}
+// 	json.NewEncoder(w).Encode(todo)
+// }
 
-func jsonRespMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		next.ServeHTTP(w, r)
-	})
-}
+// func v1AuthTokenHandler(w http.ResponseWriter, r *http.Request) {
+// 	params := r.URL.Query()
+// 	errs := []error{}
+// 	username, password := params.Get("username"), params.Get("password")
+// 	if username == "" {
+// 		errs = append(errs, ErrAuthUsernameNotProvided)
+// 	}
+// 	if password == "" {
+// 		errs = append(errs, ErrAuthPasswordNotProvided)
+// 	}
+// 	if len(errs) > 0 {
+// 		respondErrors(w, errs)
+// 		return
+// 	}
 
-func respondErrors(w http.ResponseWriter, errors []error) {
-	errs := make([]string, 0, len(errors))
-	for _, err := range errors {
-		errs = append(errs, err.Error())
-	}
-	w.WriteHeader(http.StatusBadRequest)
-	json.NewEncoder(w).Encode(&ErrResponse{Errors: errs})
-}
+// 	token, err := tokenMaker.CreateToken(username, TokenDuration)
+// 	if err != nil {
+// 		w.WriteHeader(http.StatusInternalServerError)
+// 		w.Write([]byte(ErrInternalServerErrorJson))
+// 		return
+// 	}
+// 	json.NewEncoder(w).Encode(struct {
+// 		Token string `json:"token"`
+// 	}{Token: token})
+// }
+// func v1AuthTokenVerifyHandler(w http.ResponseWriter, r *http.Request) {
+// 	params := r.URL.Query()
+// 	errs := []error{}
+// 	token := params.Get("auth_token")
+// 	if token == "" {
+// 		errs = append(errs, ErrAuthTokenNotProvided)
+// 	}
+// 	if len(errs) > 0 {
+// 		respondErrors(w, errs)
+// 		return
+// 	}
+
+// 	_, err := tokenMaker.VerifyToken(token)
+// 	json.NewEncoder(w).Encode(struct {
+// 		IsValid bool `json:"is_valid"`
+// 	}{IsValid: err == nil})
+// }
+
+// func jsonRespMiddleware(next http.Handler) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		w.Header().Set("Content-Type", "application/json")
+// 		next.ServeHTTP(w, r)
+// 	})
+// }
+
+// func respondErrors(w http.ResponseWriter, errors []error) {
+// 	errs := make([]string, 0, len(errors))
+// 	for _, err := range errors {
+// 		errs = append(errs, err.Error())
+// 	}
+// 	w.WriteHeader(http.StatusBadRequest)
+// 	json.NewEncoder(w).Encode(&ErrResponse{Errors: errs})
+// }

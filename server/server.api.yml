@@ -3,4 +3,6 @@ output: generated/api/server.gen.go
 # import-mapping: []
 generate:
   - types
+  - models
   - gin
+  # - spec
