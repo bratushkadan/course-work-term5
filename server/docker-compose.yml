@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  server:
+    image: golang:1.21.1-bookworm
+    ports:
+      - 8080
+    command: ['go', 'run', '/app/*.go']
+    volumes:
+      - ./:/app
+    networks:
+      - course_work_app_network
+    environment:
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: bratushkadan
+      POSTGRES_PASSWORD: '123'
+      POSTGRES_DB: floral
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16
+    ports:
+      # FIXME: - 5432
+      - 5432:5432
+    restart: always
+    environment:
+      POSTGRES_USER: bratushkadan
+      POSTGRES_PASSWORD: '123'
+      POSTGRES_DB: floral
+    networks:
+      - course_work_app_network
+    volumes:
+      - course_work_postgres_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'test -n `pg_isready -U $POSTGRES_USER | grep "accepting connections"`']
+      interval: 0.5s
+      retries: 10
+
+volumes:
+  course_work_postgres_volume:
+networks:
+  course_work_app_network:
+    driver: bridge

@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
-	"floral/auth"
-	"floral/database"
+	"floral/config"
+	"floral/generated/database"
 
 	"floral/internal/app"
+	"floral/internal/auth"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -35,8 +35,6 @@ type Bar struct {
 	LastName  string
 }
 
-var tokenSecret = os.Getenv("TOKEN_SECRET")
-
 var tokenMaker auth.Maker
 
 const TokenDuration = 30 * 24 * time.Hour // 30 days
@@ -44,12 +42,8 @@ const TokenDuration = 30 * 24 * time.Hour // 30 days
 const ErrInternalServerErrorJson = `{"error": "Internal server error."}`
 
 func init() {
-	if tokenSecret == "" {
-		log.Fatal(`env "TOKEN_SECRET" must not be empty\n`)
-	}
-
 	var err error
-	tokenMaker, err = auth.NewPasetoMaker(tokenSecret)
+	tokenMaker, err = auth.NewPasetoMaker(config.App.Token.Secret)
 	if err != nil {
 		log.Fatal(fmt.Errorf("error creating token maker: %w", err))
 	}
@@ -74,8 +68,9 @@ func main() {
 	usersHandler := func(w http.ResponseWriter, r *http.Request) {
 		users, err := GetUsers()
 		if err != nil {
+			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`{}`))
+			w.Write([]byte(`[]`))
 			return
 		}
 		if users == nil {
@@ -101,7 +96,7 @@ func main() {
 			} else {
 				w.WriteHeader(http.StatusInternalServerError)
 			}
-			w.Write([]byte(`{}`))
+			w.Write([]byte(`[]`))
 			return
 		}
 		json.NewEncoder(w).Encode(user)
@@ -113,7 +108,7 @@ func main() {
 
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("{}"))
+		w.Write([]byte(`{error: "handler for route not found"}`))
 	})
 
 	handler := cors.AllowAll().Handler(router)
