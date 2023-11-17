@@ -34,7 +34,7 @@ services:
     volumes:
       - course_work_postgres_volume:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'test -n `pg_isready -U $POSTGRES_USER | grep "accepting connections"`']
+      test: ['CMD-SHELL', 'test -n `pg_isready -U $POSTGRES_USER $POSTGRES_DB | grep "accepting connections"`']
       interval: 0.5s
       retries: 10
 

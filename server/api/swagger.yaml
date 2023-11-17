@@ -1,0 +1,74 @@
+openapi: 3.0.0
+info:
+  title: Floral Store API
+  description: API for Floral Store Aggregation
+  version: 0.0.1
+
+paths:
+  /ping: &path_ping
+    get:
+      description: Get service health
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ts:
+                    type: integer
+                    format: int32
+  /health: *path_ping
+  /v1/users:
+      get:
+        description: Get users
+        responses:
+          200:
+            description: List of Users
+            content:
+              application/json:
+                  schema:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/User"
+  /v1/users/{id}:
+      get:
+        description: Get user
+        parameters:
+          - in: path
+            name: id
+            description: User's ID
+            required: true
+            schema:
+              type: integer
+              format: int64
+        responses:
+          200:
+            description: User
+            content:
+              application/json:
+                schema:
+                  "$ref": "#/components/schemas/User"
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        phone_number:
+          type: string
+        created:
+          type: integer
+          format: int64
