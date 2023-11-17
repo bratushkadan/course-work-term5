@@ -35,19 +35,6 @@ type Bar struct {
 	LastName  string
 }
 
-func (b *Bar) String() string {
-	return fmt.Sprintf("%s %s", b.FirstName, b.LastName)
-}
-
-func init() {
-	b := &Bar{FirstName: "Dan", LastName: "Bratushka"}
-	foobar(b)
-}
-
-func foobar(foo Foo) string {
-	return foo.String()
-}
-
 var tokenSecret = os.Getenv("TOKEN_SECRET")
 
 var tokenMaker auth.Maker
