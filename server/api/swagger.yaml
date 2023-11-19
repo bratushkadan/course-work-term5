@@ -46,6 +46,76 @@ paths:
               application/json:
                 schema:
                   "$ref": "#/components/schemas/User"
+  /v1/cart:
+    get:
+      description: Get user's Cart
+      parameters:
+        - in: query
+          name: id
+          description: User's ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: User's cart
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Cart"
+  /v1/products:
+    get:
+      description: Get Products
+      parameters:
+        - in: query
+          name: store_id
+          description: ID of the Store
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Product"
+  /v1/products/{id}:
+    get:
+      description: Get Products
+      parameters:
+        - in: path
+          name: product_id
+          description: ID of the Product
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Products
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Product"               
+  /v1/favorite:
+    get:
+      description: Get favorite
+      parameters:
+        - in: query
+          name: store_id
+          description: ID of the Store
+          required: false
+          schema:
+            type: integer
+            format: int64
+  # /v1/
+  # /v1/
+  # /v1/
 
 components:
   schemas:
@@ -55,6 +125,30 @@ components:
       type: object
       properties:
         ts:
+          type: integer
+          format: int64
+    Store:
+      required:
+        - id
+        - name
+        - password
+        - email
+        - phone_number
+        - created
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+        phone_number:
+          type: string
+        created:
           type: integer
           format: int64
     User:
@@ -70,7 +164,7 @@ components:
       properties:
         id:
           type: integer
-          format: int32
+          format: int64
         first_name:
           type: string
         last_name:
@@ -80,6 +174,177 @@ components:
         password:
           type: string
         phone_number:
+          type: string
+        created:
+          type: integer
+          format: int64
+    ProductCategory:
+      required:
+        - id
+        - name
+        - description
+        - created
+        - modified
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        phone_number:
+          type: string
+        created:
+          type: number
+          format: int64
+    Product:
+      required:
+        - id
+        - store_id
+        - name
+        - description
+        - image_url
+        - price
+        - created
+        - modified
+        - category
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        store_id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        description:
+          type: string
+        image_url:
+          type: string
+        price:
+          type: integer
+          format: int32
+        created:
+          type: integer
+          format: int64
+        modified:
+          type: integer
+          format: int64
+        category:
+          type: integer
+          format: int32
+        common_traits:
+          type: object
+          properties:
+            min_height:
+              type: integer
+              format: int32
+            max_height:
+              type: integer
+              format: int32
+    Favorite:
+      required:
+        # - user_id
+        - product_id
+      type: object
+      properties:
+        user_id:
+          type: integer
+          format: int64
+        product_id:
+          type: integer
+          format: int64
+    CartPosition: &cart_position
+      required:
+        - order_id
+        - product_id
+        - quantity
+      type: object
+      properties:
+        order_id:
+          type: integer
+          format: int64
+        product_id:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
+          format: int32
+    Cart:
+      type: array
+      items:
+        type: object
+        properties:
+          product:
+            "$ref": "#/components/schemas/Product"
+          quantity:
+            type: integer
+            format: int64
+    OrderPosition: *cart_position
+    Order:
+      required:
+        - id
+        - status
+        - user_id
+        - created
+        - status_modified
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        status:
+          type: string
+          description: Order status
+          enum:
+            - created
+            - in_progress
+            - processed
+            - delivery
+            - canceled
+            - completed
+        user_id:
+          type: integer
+          format: int64
+        created:
+          type: integer
+          format: int64
+        status_modified:
+          type: integer
+          format: int64
+    ProductReview:
+      required:
+        - id
+        - user_id
+        - product_id
+        - rating
+        - review_text
+        - created
+        - modifed
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        product_id:
+          type: integer
+          format: int64
+        rating:
+          minimum: 1
+          maximum: 100
+          type: number
+          format: integer
+        review_text:
           type: string
         created:
           type: integer

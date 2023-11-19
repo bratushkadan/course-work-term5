@@ -45,17 +45,15 @@ CREATE TABLE IF NOT EXISTS "floral"."product" (
   "image_url" varchar(300) NOT NULL,
   "price" integer NOT NULL,
   "created" timestamp NOT NULL,
+  "min_height" smallint,
+  "max_height" smallint,
   "modified" timestamp NOT NULL,
   "category" integer
 );
 
-CREATE TABLE IF NOT EXISTS "floral"."product_common_traits" (
-  "product_id" integer PRIMARY KEY NOT NULL,
-  "min_height" smallint,
-  "max_height" smallint,
-  "created" timestamp NOT NULL,
-  "modified" timestamp NOT NULL
-);
+COMMENT ON COLUMN "floral"."product"."min_height" IS 'in cm';
+
+COMMENT ON COLUMN "floral"."product"."max_height" IS 'in cm';
 
 CREATE TABLE IF NOT EXISTS "floral"."user_favorite" (
   "user_id" integer NOT NULL,
@@ -121,10 +119,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS "review_user_id_product_id_key" ON "floral"."r
 
 COMMENT ON COLUMN "floral"."product"."category" IS 'id of the product"s category';
 
-COMMENT ON COLUMN "floral"."product_common_traits"."min_height" IS 'in cm';
-
-COMMENT ON COLUMN "floral"."product_common_traits"."max_height" IS 'in cm';
-
 -- TODO: make foreign key expessions idempotent
 ALTER TABLE
   "floral"."product"
@@ -137,11 +131,6 @@ ADD
   FOREIGN KEY ("category") REFERENCES "floral"."product_category" ("id") ON DELETE
 SET
   NULL ON UPDATE CASCADE;
-
-ALTER TABLE
-  "floral"."product_common_traits"
-ADD
-  FOREIGN KEY ("product_id") REFERENCES "floral"."product" ("id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 ALTER TABLE
   "floral"."user_favorite"
@@ -214,20 +203,6 @@ SET
 
 ALTER TABLE
   "floral"."product_category"
-ALTER COLUMN
-  modified
-SET
-  DEFAULT NOW();
-
-ALTER TABLE
-  "floral"."product_common_traits"
-ALTER COLUMN
-  created
-SET
-  DEFAULT NOW();
-
-ALTER TABLE
-  "floral"."product_common_traits"
 ALTER COLUMN
   modified
 SET
