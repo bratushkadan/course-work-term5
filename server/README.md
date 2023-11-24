@@ -36,6 +36,10 @@ sqlc generate
 docker-compose up -d db
 ```
 
+### `psql` into a db container
+
+docker exec -it -e PGPASSWORD=123 server-db-1 psql -U bratushkadan floral
+
 ### Start Go application
 
 ```sh
