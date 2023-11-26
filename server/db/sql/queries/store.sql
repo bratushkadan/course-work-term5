@@ -8,24 +8,24 @@ FROM
 WHERE
   id = $1;
 
--- name: CountStoreByCreds :one
+-- name: GetStorePassword :one
 SELECT
-  count(id) as "count"
+  password
 FROM
   "floral"."store"
 WHERE
-  email = $1 AND
-  password = $2;
+  email = $1;
 
--- name: CreateStore :one
+-- name: AddStore :one
 INSERT INTO
   "floral"."store" (name, email, password, phone_number)
 VALUES
-  ($1, $2, $3, $4, $5)
+  ($1, $2, $3, $4)
 RETURNING id, name, email, phone_number, created;
 
 -- name: DeleteStore :one
 DELETE FROM
   "floral"."store"
 WHERE
-  id = $1 AND password = $2;
+  id = $1 AND password = $2
+RETURNING *;

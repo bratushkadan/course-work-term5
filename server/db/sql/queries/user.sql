@@ -14,14 +14,13 @@ FROM
 WHERE
   id = $1;
 
--- name: CountUserByCreds :one
+-- name: GetUserCreds :one
 SELECT
-  count(id) as "count"
+  id, password
 FROM
   "floral"."user"
 WHERE
-  email = $1 AND
-  password = $2;
+  email = $1;
 
 -- name: CreateUser :one
 INSERT INTO
@@ -35,5 +34,5 @@ UPDATE
   "floral"."user"
 SET
   password = $1
-WHERE id = $2 AND password = $3
+WHERE id = $2
 RETURNING id, first_name, last_name, email, phone_number, created;

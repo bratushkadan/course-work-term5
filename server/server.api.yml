@@ -5,4 +5,4 @@ generate:
   - types
   - models
   - gin
-  # - spec
+  - spec

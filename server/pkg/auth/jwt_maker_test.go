@@ -19,7 +19,7 @@ func TestJWTMaker(t *testing.T) {
 	expiresAt := issuedAt.Add(duration)
 
 	maker, _ := NewJWTMaker(tokenSecJwt)
-	token, _ := maker.CreateToken(username, duration)
+	token, _ := maker.CreateToken(username, 0, duration)
 
 	// act
 	userClaims, err := maker.VerifyToken(token)
@@ -38,7 +38,7 @@ func TestJWTMaker(t *testing.T) {
 func TestExpiredJWT(t *testing.T) {
 	// arrange
 	maker, _ := NewJWTMaker(tokenSecJwt)
-	token, _ := maker.CreateToken("bratushkadan", -1*time.Minute)
+	token, _ := maker.CreateToken("bratushkadan", 0, -1*time.Minute)
 
 	// act
 	userClaim, err := maker.VerifyToken(token)

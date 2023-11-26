@@ -8,7 +8,7 @@
 
 ### Dependencies
 
-1. `sqlc`
+1. `sqlc` v1.24
 2. [OAPI Codegen](https://github.com/deepmap/oapi-codegen#overview)
 
 ### Generate Server Side API Code

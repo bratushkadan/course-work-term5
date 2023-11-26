@@ -18,8 +18,8 @@ var (
 	ErrInvalidKeySize = errors.New("invalid key size")
 )
 
-func (m *PasetoMaker) CreateToken(username string, duration time.Duration) (string, error) {
-	userClaim, err := NewUserClaim(username, duration)
+func (m *PasetoMaker) CreateToken(username string, id int32, duration time.Duration) (string, error) {
+	userClaim, err := NewUserClaim(username, id, duration)
 	if err != nil {
 		return "", err
 	}

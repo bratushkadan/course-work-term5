@@ -2,9 +2,11 @@ package db
 
 import (
 	"context"
-	"database/sql"
+	"time"
 
 	"floral/generated/database"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"floral/config"
 
@@ -18,29 +20,38 @@ type User struct {
 	Username string
 }
 
-func GetUsers() ([]database.FloralUser, error) {
-	dbConn, err := sql.Open("postgres", config.App.Postgres.Connstr)
+var db *pgxpool.Pool
+
+func init() {
+	cfg, err := pgxpool.ParseConfig(config.App.Postgres.Connstr)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	defer dbConn.Close()
+	cfg.MaxConnLifetime = 3 * time.Minute
+	cfg.MinConns = 3
+	cfg.MaxConns = 10
+	cfg.HealthCheckPeriod = 30 * time.Second
 
-	db := database.New(dbConn)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	pool, err := pgxpool.NewWithConfig(ctx, cfg)
 
-	return db.GetUsers(context.Background())
+	if err != nil {
+		panic(err)
+	}
+
+	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	err = pool.Ping(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	db = pool
 }
-func GetUser(id int32) (*database.FloralUser, error) {
-	dbConn, err := sql.Open("postgres", config.App.Postgres.Connstr)
-	if err != nil {
-		return nil, err
-	}
 
-	defer dbConn.Close()
-
-	db := database.New(dbConn)
-
-	user, err := db.GetUser(context.Background(), id)
-
-	return &user, err
+func NewQueries() *database.Queries {
+	return database.New(db)
 }
