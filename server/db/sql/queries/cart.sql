@@ -23,3 +23,10 @@ WHERE
   user_id = $1 AND
   product_id = $2
 RETURNING *;
+
+-- name: ClearCart :many
+DELETE FROM
+  "floral"."cart_position"
+WHERE
+  user_id = $1
+RETURNING *;

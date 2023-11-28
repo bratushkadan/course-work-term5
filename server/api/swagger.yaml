@@ -10,7 +10,7 @@ paths:
       description: Get service health
       responses:
         200:
-          "$ref": "#/components/responses/Ping"
+          $ref: "#/components/responses/Ping"
   /health: *path_ping
   /v1/auth/token/user:
     get: &v1_auth_token_user_get
@@ -46,87 +46,132 @@ paths:
     post: *v1_auth_token_user_post
 
   /v1/users:
-      get:
-        description: Get users
-        responses:
-          200:
-            description: List of Users
-            content:
-              application/json:
-                schema:
-                  type: array
-                  items:
-                    "$ref": "#/components/schemas/User"
-      post:
-        description: Register user
-        requestBody:
+    post:
+      description: Register user
+      requestBody:
+        $ref: "#/components/requestBodies/CreateUser"
+      responses:
+        201:
+          $ref: "#/components/responses/User"
+  /v1/users/{id}:
+    get:
+      description: Get user
+      parameters:
+        - in: path
+          name: id
           required: true
-          content:
-            application/json:
-              schema:
-                  "$ref": "#/components/schemas/CreateUser"
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          $ref: "#/components/responses/User"
+        404:
+          $ref: "#/components/responses/Error"
+          
+  /v1/stores:
+      post:
+        description: Register store
+        requestBody:
+          $ref: "#/components/requestBodies/CreateStore"
         responses:
           201:
-            $ref: "#/components/responses/CreateUser" 
-  /v1/users/{id}:
+            $ref: "#/components/responses/Store"
       get:
-        description: Get user
+        description: Get stores
+        responses:
+          201:
+            $ref: "#/components/responses/Store"
+          404:
+            $ref: "#/components/responses/Error"
+  /v1/stores/{id}:
+      get:
+        description: Get store
         parameters:
           - in: path
             name: id
-            description: User's ID
             required: true
             schema:
               type: integer
               format: int32
         responses:
-          200:
-            description: User
-            content:
-              application/json:
-                schema:
-                  "$ref": "#/components/schemas/User"
-  /v1/cart:
-    get:
-      description: Get user's Cart
-      parameters:
-        - in: query
-          name: id
-          description: User's ID
-          required: true
-          schema:
-            type: integer
-            format: int32
-      responses:
-        200:
-          description: User's cart
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/Cart"
+          201:
+            $ref: "#/components/responses/Store"
+          404:
+            $ref: "#/components/responses/Error"
   /v1/products:
     get:
       description: Get Products
       parameters:
         - in: query
-          name: store_id
-          description: ID of the Store
+          name: sort_by
+          description: sort attribute
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
+            default: id
+            enum:
+              - id
+              - price
+              - store_id
+              - max_height
+        - in: query
+          name: sort_order
+          description: sort attribute
+          required: false
+          schema:
+            type: string
+            default: asc
+            enum:
+              - asc
+              - desc
+        - in: query
+          name: filter
+          description: filter attribute
+          required: false
+          schema:
+            type: object
+            properties:
+              filter.like_name:
+                type: string
+                nullable: true
+              filter.store_id:
+                type: integer
+                format: int32
+                nullable: true
+              filter.category_id:
+                type: integer
+                format: int32
+                nullable: true
+              filter.min_height:
+                type: integer
+                format: int32
+                nullable: true
+              filter.max_height:
+                type: integer
+                format: int32
+                nullable: true
+              filter.min_price:
+                type: integer
+                format: int32
+                nullable: true
+              filter.max_price:
+                type: integer
+                format: int32
+                nullable: true
       responses:
         200:
-          description: Products
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  "$ref": "#/components/schemas/Product"
+          $ref: "#/components/responses/Products"
+    post:
+      description: Add Product
+      requestBody:
+        $ref: "#/components/requestBodies/CreateProduct"
+      responses:
+        201:
+          $ref: "#/components/responses/Product"
   /v1/products/{id}:
     get:
-      description: Get Products
+      description: Get Product
       parameters:
         - in: path
           name: id
@@ -141,7 +186,51 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Product"               
+                "$ref": "#/components/schemas/Product" 
+  /v1/categories:
+    get:
+      description: Get Categories
+      responses:
+        200:
+          $ref: "#/components/responses/Categories"
+    post:
+      description: Add Category
+      requestBody:
+        $ref: "#/components/requestBodies/CreateCategory"
+      responses:
+        201:
+          $ref: "#/components/responses/Category"
+  /v1/categories/{id}:
+    get:
+      description: Get Category
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        200:
+          $ref: "#/components/responses/Category"
+  # /v1/cart:
+  #   get:
+  #     description: Get user's Cart
+  #     parameters:
+  #       - in: query
+  #         name: id
+  #         description: User's ID
+  #         required: true
+  #         schema:
+  #           type: integer
+  #           format: int32
+  #     responses:
+  #       200:
+  #         description: User's cart
+  #         content:
+  #           application/json:
+  #             schema:
+  #               "$ref": "#/components/schemas/Cart"              
   # /v1/favorite:
   #   get:
   #     responses:
@@ -222,13 +311,181 @@ components:
             properties:
               valid:
                 type: boolean
-    CreateUser:
-      description: User created
-      x-go-name: CreateUserResponse
+    User:
+      description: User
+      x-go-name: UserResponse
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/User"
+    Store:
+      description: Store
+      x-go-name: StoreResponse
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Store"
+    Stores:
+      description: Stores
+      x-go-name: StoresResponse
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Store"
+    Category:
+      description: Category
+      x-go-name: CategoryResponse
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Category"
+    Categories:
+      description: Categories
+      x-go-name: CategoriesResponse
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Category"
+    Product:
+      description: Product
+      x-go-name: ProductResponse
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Product"
+    Products:
+      description: Products
+      x-go-name: ProductsResponse
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Product"
+  requestBodies:
+    CreateStore:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+              - password
+              - email
+              - phone_number
+            properties:
+              name:
+                type: string
+                minLength: 3
+                maxLength: 100
+              password:
+                type: string
+                minLength: 6
+                maxLength: 100
+              email:
+                type: string
+                minLength: 6
+                maxLength: 100
+              phone_number:
+                type: string
+                minLength: 8
+                maxLength: 24
+    CreateUser:
+      required: true
+      x-go-name: CreateUserRequestBody
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - first_name
+              - last_name
+              - email
+              - password
+              - phone_number
+            properties:
+              first_name:
+                type: string
+                minLength: 2
+                maxLength: 64
+              last_name:
+                type: string
+                minLength: 2
+                maxLength: 64
+              email:
+                type: string
+                minLength: 5
+                maxLength: 256
+              password:
+                type: string
+                minLength: 6
+                maxLength: 128
+              phone_number:
+                type: string
+                minLength: 8
+                maxLength: 24
+    CreateProduct:
+      required: true
+      x-go-name: CreateProductRequestBody
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - store_id
+              - name
+              - description
+              - image_url
+              - price
+              - min_height
+              - max_height
+              - category_id
+            properties:
+              store_id:
+                type: integer
+                format: int32
+              name:
+                type: string
+              description:
+                type: string
+              image_url:
+                type: string
+              price:
+                type: integer
+                format: int32
+              min_height:
+                type: integer
+                format: int32
+              max_height:
+                type: integer
+                format: int32
+              category_id:
+                type: integer
+                format: int32
+    CreateCategory:
+      required: true
+      x-go-name: CreateCategoryRequestBody
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+              - description
+            properties:
+              name:
+                type: string
+                minLength: 4
+                maxLength: 128
+              description:
+                type: string
+                minLength: 0
+                maxLength: 2048
   parameters:
     AuthToken:
       in: header
@@ -243,7 +500,6 @@ components:
       required:
         - id
         - name
-        - password
         - email
         - phone_number
         - created
@@ -253,44 +509,13 @@ components:
           format: int32
         name:
           type: string
-        password:
-          type: string
         email:
           type: string
         phone_number:
           type: string
         created:
           type: integer
-          format: int32
-    CreateUser:
-      type: object
-      required:
-        - first_name
-        - last_name
-        - email
-        - password
-        - phone_number
-      properties:
-        first_name:
-          type: string
-          minLength: 2
-          maxLength: 64
-        last_name:
-          type: string
-          minLength: 2
-          maxLength: 64
-        email:
-          type: string
-          minLength: 5
-          maxLength: 256
-        password:
-          type: string
-          minLength: 6
-          maxLength: 128
-        phone_number:
-          type: string
-          minLength: 8
-          maxLength: 24
+          format: int64
     User:
       type: object
       required:
@@ -335,7 +560,7 @@ components:
           type: string
         created:
           type: number
-          format: int32
+          format: int64
     Product:
       required:
         - id
@@ -344,9 +569,10 @@ components:
         - description
         - image_url
         - price
-        - created
-        - modified
+        - min_height
+        - max_height
         - category
+        - created
       type: object
       properties:
         id:
@@ -366,22 +592,45 @@ components:
           format: int32
         created:
           type: integer
-          format: int32
-        modified:
-          type: integer
-          format: int32
+          format: int64
         category:
+          type: object
+          required:
+            - id
+            - name
+            - description
+          properties:
+            id:
+              type: integer
+              format: int32
+            name:
+              type: string
+            description:
+              type: string
+        min_height:
           type: integer
           format: int32
-        common_traits:
-          type: object
-          properties:
-            min_height:
-              type: integer
-              format: int32
-            max_height:
-              type: integer
-              format: int32
+        max_height:
+          type: integer
+          format: int32
+    Category:
+      required:
+        - id
+        - name
+        - description
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+          minLength: 4
+          maxLength: 128
+        description:
+          type: string
+          minLength: 0
+          maxLength: 2048
     Favorite:
       required:
         # - user_id
@@ -448,10 +697,10 @@ components:
           format: int32
         created:
           type: integer
-          format: int32
+          format: int64
         status_modified:
           type: integer
-          format: int32
+          format: int64
     ProductReview:
       required:
         - id
@@ -481,4 +730,4 @@ components:
           type: string
         created:
           type: integer
-          format: int32
+          format: int64

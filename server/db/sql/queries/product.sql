@@ -64,25 +64,47 @@ RETURNING *;
 
 
 -- name: GetProducts :many
+WITH p AS (
+  SELECT
+    p.id, 
+    p.store_id,
+    p.name,
+    p.description,
+    p.image_url,
+    p.price,
+    p.min_height,
+    p.max_height,
+    pc.id AS "category_id",
+    pc.name AS "category_name",
+    pc.description AS "category_description",
+    p.created
+  FROM
+    "floral"."product" p
+  JOIN
+    "floral"."product_category" pc
+  ON
+    p.category_id = pc.id
+)
 SELECT
-  p.id, 
-  p.store_id,
-  p.name,
-  p.description,
-  p.image_url,
-  p.price,
-  p.min_height,
-  p.max_height,
-  pc.id AS "category_id",
-  pc.name AS "category_name",
-  pc.description AS "category_description",
-  p.created
-FROM
-  "floral"."product" p
-JOIN
-  "floral"."product_category" pc
-ON
-  p.category_id = pc.id;
+  *
+FROM p
+WHERE
+  (@lk_name::bool = false OR LOWER(p.name) LIKE ('%' || LOWER(@name) || '%'))
+  AND (CASE WHEN @is_store_id::bool THEN p.store_id = @store_id ELSE TRUE END)
+  AND (CASE WHEN @is_category_id::bool THEN p.category_id = @category_id ELSE TRUE END)
+  AND (CASE WHEN @is_min_height::bool THEN p.min_height >= @min_height ELSE TRUE END)
+  AND (CASE WHEN @is_max_height::bool THEN p.max_height >= @max_height ELSE TRUE END)
+  AND (CASE WHEN @is_min_price::bool THEN p.price >= @min_price ELSE TRUE END)
+  AND (CASE WHEN @is_max_price::bool THEN p.price <= @max_price ELSE TRUE END)
+ORDER BY
+  CASE WHEN @id_asc::bool THEN id END ASC,
+  CASE WHEN @id_desc::bool THEN id END DESC,
+  CASE WHEN @max_height_asc::bool THEN id END ASC,
+  CASE WHEN @max_height_desc::bool THEN id END DESC,
+  CASE WHEN @price_asc::bool THEN id END ASC,
+  CASE WHEN @price_desc::bool THEN id END DESC,
+  CASE WHEN @store_id_asc::bool THEN id END ASC,
+  CASE WHEN @store_id_desc::bool THEN id END DESC;
 
 -- name: GetStoreProducts :many
 SELECT
@@ -106,6 +128,14 @@ ON
   p.category_id = pc.id
 WHERE
   p.store_id = $1;
+
+-- name: GetProductsCategory :one
+SELECT
+  id, name, description
+FROM
+  "floral"."product_category"
+WHERE
+  id = $1;
 
 -- name: GetProductsCategories :many
 SELECT

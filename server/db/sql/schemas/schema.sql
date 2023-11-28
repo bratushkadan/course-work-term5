@@ -44,8 +44,8 @@ CREATE TABLE "floral"."product" (
   "description" varchar(1000) DEFAULT '',
   "image_url" varchar(300) NOT NULL,
   "price" integer NOT NULL,
-  "min_height" smallint,
-  "max_height" smallint,
+  "min_height" integer,
+  "max_height" integer,
   "category_id" integer,
   "created" timestamp NOT NULL DEFAULT NOW(),
   "modified" timestamp NOT NULL DEFAULT NOW()

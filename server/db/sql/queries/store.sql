@@ -8,9 +8,15 @@ FROM
 WHERE
   id = $1;
 
--- name: GetStorePassword :one
+-- name: GetStores :many
 SELECT
-  password
+  id, name, email, phone_number, created
+FROM
+  "floral"."store";
+
+-- name: GetStoreCreds :one
+SELECT
+  id, password
 FROM
   "floral"."store"
 WHERE
