@@ -6,11 +6,8 @@ SELECT
   p.description,
   p.image_url,
   p.price,
-  p.min_height,
-  p.max_height,
   pc.id AS "category_id",
   pc.name AS "category_name",
-  pc.description AS "category_description",
   uf.created AS "added_favorite"
 FROM
   "floral"."user_favorite" uf
@@ -30,7 +27,7 @@ INSERT INTO
   "floral"."user_favorite" (user_id, product_id)
 VALUES
   ($1, $2)
-RETURNING *;
+RETURNING product_id;
 
 -- name: RemoveUserFavoriteProduct :one
 DELETE FROM
@@ -38,4 +35,4 @@ DELETE FROM
 WHERE
   user_id = $1 AND
   product_id = $2
-RETURNING *;
+RETURNING product_id;

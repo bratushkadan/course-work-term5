@@ -24,7 +24,11 @@ RETURNING id, user_id, status, created, status_modified;
 
 -- name: GetUserOrders :many
 SELECT
-  id, user_id, status, created, status_modified
+  id,
+  user_id,
+  status,
+  created,
+  status_modified
 FROM
   "floral"."order"
 WHERE
@@ -32,22 +36,22 @@ WHERE
 
 -- name: GetUserOrderPositions :many
 SELECT
+  p.id,
   op.quantity,
-  o.id AS "order_id",
-  p.id AS "product_id",
-  p.name AS "product_name",
-  p.image_url AS "product_image_url",
-  p.price AS "product_price"
+  p.name,
+  p.description,
+  p.price,
+  p.image_url,
+  p.category_id,
+  c.name AS "category_name",
+  s.id AS "store_id",
+  s.name AS "store_name"
 FROM
   "floral"."order_position" op
-JOIN
-  "floral"."order" o
-ON
-  op.order_id = o.id
-JOIN
-  "floral"."product" p
-ON
-  op.product_id = p.id
+JOIN "floral"."order" o ON op.order_id = o.id
+JOIN "floral"."product" p ON op.product_id = p.id
+JOIN "floral"."store" s ON p.store_id = s.id
+JOIN "floral"."product_category" c ON p.category_id = c.id
 WHERE
   order_id = $1;
 

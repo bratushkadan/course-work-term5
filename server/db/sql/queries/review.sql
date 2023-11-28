@@ -1,3 +1,21 @@
+-- name: GetProductReview :one
+SELECT
+  r.id,
+  r.user_id,
+  r.product_id,
+  r.rating,
+  r.review_text,
+  r.created,
+  r.modified,
+  (u.first_name || u.last_name) AS "user_name"
+FROM
+  "floral"."review" r
+JOIN
+  "floral"."user" u
+ON
+  r.user_id = u.id
+WHERE r.id = $1;
+
 -- name: GetProductReviews :many
 SELECT
   r.id,
@@ -5,8 +23,9 @@ SELECT
   r.product_id,
   r.rating,
   r.review_text,
-  u.first_name AS "user_first_name",
-  u.last_name AS "user_last_name"
+  r.created,
+  r.modified,
+  (u.first_name || u.last_name) AS "user_name"
 FROM
   "floral"."review" r
 JOIN
@@ -17,10 +36,10 @@ WHERE r.product_id = $1;
 
 -- name: AddProductReview :one
 INSERT INTO
-  "floral"."review" (rating, review_text, modified)
+  "floral"."review" (user_id, product_id, rating, review_text)
 VALUES
-  ($1, $2, NOW())
-RETURNING *;
+  ($1, $2, $3, $4)
+RETURNING id;
 
 -- name: UpdateProductReview :one
 UPDATE
@@ -30,13 +49,15 @@ SET
   review_text = $2,
   modified = NOW()
 WHERE
-  id = $3
-RETURNING *;
+  user_id = $3
+  AND product_id = $4
+RETURNING id;
 
 -- name: DeleteProductReview :one
 DELETE FROM
   "floral"."review"
 WHERE
-  id = $1
-RETURNING *;
+  user_id = $1 AND
+  product_id = $2
+RETURNING id;
 
