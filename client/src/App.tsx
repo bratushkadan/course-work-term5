@@ -1,9 +1,8 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 import { createBrowserRouter, RouterProvider, Link, useParams } from 'react-router-dom';
+import styled from 'styled-components';
+import {LoginPanel} from './components/LoginPanel';
 
 function Page() {
   const {id} = useParams()
@@ -19,7 +18,7 @@ const router = createBrowserRouter(
   [
     {
       path: '/',
-      element: <DefaultPage />,
+      element: null,
     },
     {
       path: '/todo/:id',
@@ -36,38 +35,56 @@ const router = createBrowserRouter(
   ]
 );
 
-function DefaultPage() {
-  const [count, setCount] = useState(0);
+const PageWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+`
 
-  return (
-    <>
-    <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-    </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+const HeaderContent = styled.header`
+  min-height: 1rem;
+  background-color: #d3d3d3;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+`
+
+const HeaderLogo = styled.h2`
+  font-size: 2.25rem;
+  color: #0d2901;
+  margin: 0 0 0 1rem;
+`
+
+const PageContent = styled.main`
+  flex: 1;
+  flex-grow: 1;
+  overflow-y: auto;
+  
+`
+
+const FooterContent = styled.footer`
+  min-height: 3rem;
+  background-color: #d3d3d3;
+  display: flex;
+  position: sticky;
+  justify-content: center;
+  align-items: center;
+`
 
 function App() {
   return (
-    <RouterProvider router={router} />
+    <PageWrapper>
+      <HeaderContent>
+        <HeaderLogo>Floral</HeaderLogo>
+        <LoginPanel></LoginPanel>
+      </HeaderContent>
+      <PageContent>
+        <RouterProvider router={router} />
+      </PageContent>
+      <FooterContent>
+        <b>Floral</b><span> — Данила Братушка 2023</span> &copy;
+      </FooterContent>
+    </PageWrapper>
   )
 }
 
