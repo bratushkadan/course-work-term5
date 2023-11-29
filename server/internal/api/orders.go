@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	floralApi "floral/generated/api"
 	"floral/generated/database"
@@ -100,7 +101,7 @@ func (*Impl) GetV1OrdersId(c *gin.Context, id int32, params floralApi.GetV1Order
 		Id:             orderInfo.ID,
 		UserId:         orderInfo.UserID,
 		Status:         floralApi.OrderStatus(orderInfo.Status.FloralOrderStatus),
-		StatusModified: orderInfo.Created.Time.UnixMilli(),
+		StatusModified: orderInfo.StatusModified.Time.UnixMilli(),
 		Created:        orderInfo.Created.Time.UnixMilli(),
 		Positions:      orderPositions,
 	}
@@ -170,6 +171,11 @@ func (*Impl) PatchV1Orders(c *gin.Context) {
 	// ручку можно дернуть без токена
 	var requestBody floralApi.PatchV1OrdersJSONRequestBody
 	_ = requestBody
+	err := json.NewDecoder(c.Request.Body).Decode(&requestBody)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, NewJsonErr(err))
+		return
+	}
 
 	order, err := db.NewQueries().UpdateOrderStatus(context.Background(), database.UpdateOrderStatusParams{
 		ID: requestBody.Id,
@@ -184,5 +190,11 @@ func (*Impl) PatchV1Orders(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, order)
+	c.JSON(http.StatusOK, floralApi.Order{
+		Id:             order.ID,
+		UserId:         order.UserID,
+		Created:        order.Created.Time.UnixMilli(),
+		Status:         floralApi.OrderStatus(order.Status.FloralOrderStatus),
+		StatusModified: order.Created.Time.UnixMilli(),
+	})
 }

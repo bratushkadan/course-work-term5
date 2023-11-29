@@ -54,6 +54,16 @@ paths:
       responses:
         201:
           $ref: "#/components/responses/User"
+  /v1/users/me:
+    get:
+      description: Get me
+      parameters:
+        - $ref: "#/components/parameters/AuthToken"
+      responses:
+        200:
+          $ref: "#/components/responses/User"
+        401:
+          $ref: "#/components/responses/Error"
   /v1/users/{id}:
     get:
       description: Get user

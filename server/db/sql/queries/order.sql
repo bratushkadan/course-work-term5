@@ -60,7 +60,7 @@ WHERE
 
 -- name: GetUserPurchasedProduct :one
 SELECT
-  COUNT(user_id)::bool AS "purchased"
+  COUNT(user_id) > 0 AS "purchased"
 FROM 
   "floral"."order" o
 JOIN
@@ -69,7 +69,8 @@ ON
   op.order_id = o.id
 WHERE
   o.user_id = $1
-  AND product_id = $2;
+  AND product_id = $2
+  AND o.status = 'completed';
 
 -- name: AddOrderPositions :copyfrom
 INSERT INTO

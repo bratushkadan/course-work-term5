@@ -14,11 +14,24 @@ func main() {
 	var floralApi = &apiImpl.Impl{}
 
 	r := gin.Default()
-	r.Use(cors.Default())
+	r.Use(getCors())
 	r.Use(middleware.OapiRequestValidator(apiImpl.Swagger))
 	api.RegisterHandlersWithOptions(r, floralApi, api.GinServerOptions{
 		ErrorHandler: floralApi.ErrorHandler,
 	})
 
 	r.Run()
+}
+
+func getCors() gin.HandlerFunc {
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = []string{
+		"X-Auth-Token",
+	}
+	config.AllowMethods = []string{
+		"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD",
+	}
+
+	return cors.New(config)
 }

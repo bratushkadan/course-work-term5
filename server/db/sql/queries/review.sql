@@ -32,9 +32,9 @@ JOIN "floral"."user" u ON r.user_id = u.id
 JOIN "floral"."product" p ON r.product_id = p.id
 JOIN "floral"."store" s ON p.store_id = s.id
 WHERE
-  (@is_user_id::bool = true AND r.user_id = @user_id)
-  AND (@is_product_id::bool = true AND r.product_id = @product_id)
-  AND (@is_store_id::bool = true AND s.id = @store_id);
+  (@is_user_id::bool = false OR r.user_id = @user_id)
+  AND (@is_product_id::bool = false OR r.product_id = @product_id)
+  AND (@is_store_id::bool = false OR s.id = @store_id);
 
 -- name: AddProductReview :one
 INSERT INTO

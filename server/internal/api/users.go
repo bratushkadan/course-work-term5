@@ -10,6 +10,7 @@ import (
 
 	floralApi "floral/generated/api"
 	"floral/generated/database"
+	"floral/internal/auth"
 	"floral/internal/db"
 	authn "floral/pkg/auth"
 
@@ -58,6 +59,35 @@ func (*Impl) GetV1UsersId(c *gin.Context, id int32) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	user, err := db.NewQueries().GetUser(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			c.JSON(http.StatusNotFound, NewJsonErr(ErrNotFound))
+			return
+		}
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, NewJsonErr(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, floralApi.UserResponse{
+		Id:          user.ID,
+		FirstName:   user.FirstName,
+		LastName:    user.LastName,
+		Email:       user.Email,
+		PhoneNumber: user.PhoneNumber,
+	})
+}
+func (*Impl) GetV1UsersMe(c *gin.Context, params floralApi.GetV1UsersMeParams) {
+	userClaim, err := auth.Token.VerifyToken(params.XAuthToken)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusUnauthorized, NewJsonErr(ErrUnauthorized))
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	user, err := db.NewQueries().GetUser(ctx, userClaim.Id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			c.JSON(http.StatusNotFound, NewJsonErr(ErrNotFound))

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	floralApi "floral/generated/api"
 	"floral/generated/database"
@@ -11,6 +12,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -28,17 +30,19 @@ func (*Impl) GetV1Reviews(c *gin.Context, params floralApi.GetV1ReviewsParams) {
 
 	dbQuery := database.GetProductReviewsParams{}
 	if params.ProductId != nil {
-		dbQuery.IsProductID = false
+		dbQuery.IsProductID = true
 		dbQuery.ProductID = *params.ProductId
 	}
 	if params.StoreId != nil {
-		dbQuery.IsStoreID = false
+		dbQuery.IsStoreID = true
 		dbQuery.StoreID = *params.StoreId
 	}
 	if params.UserId != nil {
-		dbQuery.IsUserID = false
+		dbQuery.IsUserID = true
 		dbQuery.UserID = pgtype.Int4{Int32: *params.UserId, Valid: true}
 	}
+
+	fmt.Printf("%+v\n", dbQuery)
 
 	rows, err := db.NewQueries().GetProductReviews(context.Background(), dbQuery)
 	if err != nil {
@@ -79,6 +83,11 @@ func (*Impl) PostV1Reviews(c *gin.Context, params floralApi.PostV1ReviewsParams)
 
 	var requestBody floralApi.PostV1ReviewsJSONRequestBody
 	_ = requestBody
+	err = json.NewDecoder(c.Request.Body).Decode(&requestBody)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, NewJsonErr(err))
+		return
+	}
 
 	exists, err := db.NewQueries().GetUserPurchasedProduct(
 		context.Background(),
@@ -149,6 +158,11 @@ func (*Impl) PatchV1Reviews(c *gin.Context, params floralApi.PatchV1ReviewsParam
 
 	var requestBody floralApi.PatchV1ReviewsJSONRequestBody
 	_ = requestBody
+	err = json.NewDecoder(c.Request.Body).Decode(&requestBody)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, NewJsonErr(err))
+		return
+	}
 
 	reviewId, err := db.NewQueries().UpdateProductReview(
 		context.Background(),
@@ -208,6 +222,15 @@ func (*Impl) DeleteV1Reviews(c *gin.Context, params floralApi.DeleteV1ReviewsPar
 		},
 	)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			c.JSON(http.StatusNotFound, NewJsonErr(
+				errors.New(fmt.Sprintf(
+					`no review for product with id="%d" exists`,
+					params.ProductId,
+				)),
+			))
+			return
+		}
 		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, NewJsonErr(ErrInternalServerError))
 		return
