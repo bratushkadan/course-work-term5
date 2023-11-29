@@ -3,13 +3,15 @@ SELECT
   id, user_id, status, created, status_modified
 FROM
   "floral"."order"
-WHERE id = $1;
+WHERE
+  id = $1
+  AND user_id = $2;
 
 -- name: AddOrder :one
 INSERT INTO
   "floral"."order" (user_id, status)
 VALUES
-  ($1, $2)
+  ($1, 'created')
 RETURNING id, user_id, status, created, status_modified;
 
 -- name: UpdateOrderStatus :one
@@ -22,7 +24,7 @@ WHERE
   id = $2
 RETURNING id, user_id, status, created, status_modified;
 
--- name: GetUserOrders :many
+-- name: GetOrders :many
 SELECT
   id,
   user_id,
@@ -34,7 +36,7 @@ FROM
 WHERE
   user_id = $1;
 
--- name: GetUserOrderPositions :many
+-- name: GetOrderPositions :many
 SELECT
   p.id,
   op.quantity,
@@ -53,9 +55,23 @@ JOIN "floral"."product" p ON op.product_id = p.id
 JOIN "floral"."store" s ON p.store_id = s.id
 JOIN "floral"."product_category" c ON p.category_id = c.id
 WHERE
-  order_id = $1;
+  order_id = $1
+  AND user_id = $2;
 
--- name: AddUserOrderPositions :copyfrom
+-- name: GetUserPurchasedProduct :one
+SELECT
+  COUNT(user_id)::bool AS "purchased"
+FROM 
+  "floral"."order" o
+JOIN
+  "floral"."order_position" op
+ON
+  op.order_id = o.id
+WHERE
+  o.user_id = $1
+  AND product_id = $2;
+
+-- name: AddOrderPositions :copyfrom
 INSERT INTO
   "floral"."order_position" (order_id, product_id, quantity)
 VALUES

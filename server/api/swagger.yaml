@@ -29,13 +29,13 @@ paths:
             type: string
       responses:
         200:
-          "$ref": "#/components/responses/AuthToken"
+          $ref: "#/components/responses/AuthToken"
         400:
-          "$ref": "#/components/responses/Error"
+          $ref: "#/components/responses/Error"
     post: &v1_auth_token_user_post
       description: Verify Auth Token
       parameters:
-        - "$ref": "#/components/parameters/AuthToken"
+        - $ref: "#/components/parameters/AuthToken"
       responses:
         200:
           $ref: "#/components/responses/AuthTokenValidation"
@@ -188,7 +188,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Product" 
+                $ref: "#/components/schemas/Product" 
   
   /v1/categories:
     get:
@@ -224,7 +224,7 @@ paths:
         - $ref: "#/components/parameters/AuthToken"
       responses:
         200:
-          "$ref": "#/components/responses/Cart"
+          $ref: "#/components/responses/Cart"
     post: &v1_cart_post
       description: Change user's Cart Position
       parameters:
@@ -262,23 +262,35 @@ paths:
         - $ref: "#/components/parameters/AuthToken"
       responses:
         200:
-          "$ref": "#/components/responses/Orders"
+          $ref: "#/components/responses/Orders"
+        401:
+          description: Unauthorized
+          $ref: "#/components/responses/Error"
     post:
       description: Create Order
       parameters:
         - $ref: "#/components/parameters/AuthToken"
       responses:
         200:
-          "$ref": "#/components/responses/Order"
+          $ref: "#/components/responses/CreatedOrder"
+        400:
+          description: Bad request
+          $ref: "#/components/responses/Error"
+        401:
+          description: Unauthorized
+          $ref: "#/components/responses/Error"
     patch:
       description: Change Order status
       # parameters:
       #   - $ref: "#/components/parameters/AuthToken"
       requestBody:
-        "$ref": "#/components/requestBodies/ChangeOrderStatus"
+        $ref: "#/components/requestBodies/ChangeOrderStatus"
       responses:
         200:
-          "$ref": "#/components/responses/Order"
+          $ref: "#/components/responses/Order"
+        401:
+          description: Unauthorized
+          $ref: "#/components/responses/Error"
   /v1/orders/{id}:
     get:
       description: Get Orders data
@@ -292,7 +304,14 @@ paths:
           format: int32
       responses:
         200:
-          "$ref": "#/components/responses/Order"
+          $ref: "#/components/responses/Order"
+        401:
+          description: Unauthorized
+          $ref: "#/components/responses/Error"
+        404:
+          description: No order found
+          $ref: "#/components/responses/Error"
+
 
   /v1/favorites:
     get:
@@ -575,6 +594,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/OrderWithPositions"
+    CreatedOrder:
+      description: Created Order
+      x-go-name: CreatedOrderResponse
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Order"
     Orders:
       description: Orders data
       x-go-name: OrdersResponse
@@ -628,6 +654,8 @@ components:
         application/json:
           schema:
             type: object
+            required:
+            - id
             properties:
               id:
                 type: integer
@@ -806,8 +834,10 @@ components:
                 type: integer
                 format: int32
               rating:
-                type: integer
-                format: int32
+                type: number
+                format: double
+                minimum: 1
+                maximum: 10
               review_text:
                 type: string
               
@@ -1002,7 +1032,45 @@ components:
         category_name:
           type: string
     OrderPosition:
-      $ref: "#/components/schemas/CartProduct"
+      type: object
+      required:
+      - product_id
+      - quantity
+      - name
+      - description
+      - price
+      - image_url
+      - category
+      - category_id
+      - category_name
+      - store_id
+      - store_name
+      properties:
+        product_id:
+          type: integer
+          format: int32
+        quantity:
+          type: integer
+          format: int32
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: integer
+          format: int32
+        image_url:
+          type: string
+        category_id:
+          type: integer
+          format: int32
+        category_name:
+          type: string
+        store_id:
+          type: integer
+          format: int32
+        store_name:
+          type: string
     OrderStatus:
       type: string
       enum:
@@ -1067,6 +1135,7 @@ components:
       required:
         - product_id
         - store_id
+        - store_name
         - name
         - description
         - image_url
@@ -1082,6 +1151,8 @@ components:
         store_id:
           type: integer
           format: int32
+        store_name:
+          type: string
         name:
           type: string
         description:
@@ -1107,7 +1178,7 @@ components:
         - rating
         - review_text
         - created
-        - modifed
+        - modified
         - user_name
       type: object
       properties:
@@ -1122,9 +1193,9 @@ components:
           format: int32
         rating:
           minimum: 1
-          maximum: 100
-          type: integer
-          format: int32
+          maximum: 10
+          type: number
+          format: double
         review_text:
           type: string
         created:

@@ -1,3 +1,21 @@
+-- name: GetProductReview :one
+SELECT
+  r.id,
+  r.user_id,
+  r.product_id,
+  r.rating,
+  r.review_text,
+  r.created,
+  r.modified,
+  (u.first_name || u.last_name) AS "user_name"
+FROM
+  "floral"."review" r
+JOIN "floral"."user" u ON r.user_id = u.id
+JOIN "floral"."product" p ON r.product_id = p.id
+JOIN "floral"."store" s ON p.store_id = s.id
+WHERE
+  r.id = $1;
+
 -- name: GetProductReviews :many
 SELECT
   r.id,
