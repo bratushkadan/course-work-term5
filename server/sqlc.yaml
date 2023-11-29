@@ -6,10 +6,17 @@ sql:
       - "./db/sql/schemas/schema.sql"
     queries:
       - "./db/sql/queries/user.sql"
+      - "./db/sql/queries/store.sql"
+      - "./db/sql/queries/review.sql"
+      - "./db/sql/queries/product.sql"
+      - "./db/sql/queries/favorites.sql"
+      - "./db/sql/queries/order.sql"
+      - "./db/sql/queries/cart.sql"
 
     gen:
       go:
         package: "database"
         out: "./generated/database"
         emit_json_tags: true
+        sql_package: "pgx/v5"
         # emit_interface: true

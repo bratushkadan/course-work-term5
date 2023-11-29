@@ -43,7 +43,7 @@ func TestPasetoMaker(t *testing.T) {
 
 	// act
 	var token string
-	token, _ = maker.CreateToken(username, duration)
+	token, _ = maker.CreateToken(username, 0, duration)
 	userClaims, err := maker.VerifyToken(token)
 
 	// assert
@@ -64,7 +64,7 @@ func TestExpiredPasetoToken(t *testing.T) {
 
 	// act
 	var token string
-	token, _ = maker.CreateToken("bratushkadan", -time.Minute)
+	token, _ = maker.CreateToken("bratushkadan", 0, -time.Minute)
 	userClaim, err := maker.VerifyToken(token)
 
 	// assert

@@ -13,6 +13,7 @@ import (
 type UserClaim struct {
 	jwt.RegisteredClaims
 	Username string `json:"username"`
+	Id       int32  `json:"id"`
 }
 
 var (
@@ -31,7 +32,7 @@ func (p *UserClaim) Valid() error {
 	return nil
 }
 
-func NewUserClaim(username string, duration time.Duration) (*UserClaim, error) {
+func NewUserClaim(username string, id int32, duration time.Duration) (*UserClaim, error) {
 	tokenId, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
@@ -47,6 +48,7 @@ func NewUserClaim(username string, duration time.Duration) (*UserClaim, error) {
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 		},
 		Username: username,
+		Id:       id,
 	}
 	return userClaim, nil
 }

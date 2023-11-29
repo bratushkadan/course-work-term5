@@ -8,7 +8,7 @@
 
 ### Dependencies
 
-1. `sqlc`
+1. `sqlc` v1.24
 2. [OAPI Codegen](https://github.com/deepmap/oapi-codegen#overview)
 
 ### Generate Server Side API Code
@@ -34,6 +34,12 @@ sqlc generate
 
 ```sh
 docker-compose up -d db
+```
+
+### Start object storage
+
+```sh
+docker-compose up -d s3
 ```
 
 ### `psql` into a db container

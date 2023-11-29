@@ -37,9 +37,23 @@ services:
       test: ['CMD-SHELL', 'test -n `pg_isready -U $POSTGRES_USER $POSTGRES_DB | grep "accepting connections"`']
       interval: 0.5s
       retries: 10
-
+  s3:
+    image: quay.io/minio/minio
+    ports:
+      - 9000:9000
+      - 9090:9090
+    command: ['server', '/data', '--console-address', ':9090']
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    networks:
+      - course_work_app_network
+    volumes:
+      - course_work_s3_volume:/data
+    
 volumes:
   course_work_postgres_volume:
+  course_work_s3_volume:
 networks:
   course_work_app_network:
     driver: bridge
