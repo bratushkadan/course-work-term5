@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Floral Store API
   description: API for Floral Store Aggregation
-  version: 0.0.1
+  version: 1.0.0
 
 paths:
   /ping: &path_ping
@@ -283,19 +283,21 @@ paths:
     get:
       description: Get Orders data
       parameters:
-        - $ref: "#/components/parameters/AuthToken"
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int32
+      - $ref: "#/components/parameters/AuthToken"
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
       responses:
         200:
           "$ref": "#/components/responses/Order"
 
   /v1/favorites:
     get:
+      parameters:
+      - $ref: "#/components/parameters/AuthToken"
       responses:
         200:
           $ref: "#/components/responses/Favorites"
@@ -303,6 +305,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
     post:
       parameters:
+      - $ref: "#/components/parameters/AuthToken"
       - in: query
         name: product_id
         description: ID of the Product
@@ -322,6 +325,7 @@ paths:
     delete:
       description: Remove product from favorite
       parameters:
+      - $ref: "#/components/parameters/AuthToken"
       - in: query
         name: product_id
         description: ID of the Product
@@ -349,25 +353,28 @@ paths:
           schema:
             type: integer
             format: int32
+            nullable: true
         - in: query
           name: product_id
           required: false
           schema:
             type: integer
             format: int32
+            nullable: true
         - in: query
           name: store_id
           required: false
           schema:
             type: integer
             format: int32
+            nullable: true
       responses:
         200:
           $ref: "#/components/responses/Reviews"
     post:
       description: Add review
       parameters:
-        - $ref: "#/components/parameters/AuthToken"
+      - $ref: "#/components/parameters/AuthToken"
       requestBody:
         $ref: "#/components/requestBodies/AddUpdateReview"
       responses:
@@ -395,13 +402,13 @@ paths:
     delete:
       description: Delete review
       parameters:
-        - $ref: "#/components/parameters/AuthToken"
-        - in: query
-          name: product_id
-          required: true
-          schema:
-            type: integer
-            format: int32
+      - $ref: "#/components/parameters/AuthToken"
+      - in: query
+        name: product_id
+        required: true
+        schema:
+          type: integer
+          format: int32
       responses:
         200:
           $ref: "#/components/responses/ReviewDeleted"
@@ -782,14 +789,7 @@ components:
                 type: integer
                 format: int32
               status:
-                type: string
-                enum: &order_statuses_enum
-                - created
-                - in_progress
-                - processed
-                - delivery
-                - canceled
-                - completed
+                $ref: "#/components/schemas/OrderStatus"
     AddUpdateReview:
       required: true
       x-go-name: AddUpdateReviewRequestBody
@@ -968,7 +968,7 @@ components:
         quantity:
           type: integer
           format: int32
-    CartProduct: &cart_product
+    CartProduct:
       type: object
       required:
       - product_id
@@ -1001,7 +1001,17 @@ components:
           format: int32
         category_name:
           type: string
-    OrderPosition: *cart_product
+    OrderPosition:
+      $ref: "#/components/schemas/CartProduct"
+    OrderStatus:
+      type: string
+      enum:
+      - created
+      - in_progress
+      - processed
+      - delivery
+      - canceled
+      - completed
     Order:
       required:
         - id
@@ -1015,9 +1025,7 @@ components:
           type: integer
           format: int32
         status:
-          type: string
-          description: Order status
-          enum: *order_statuses_enum
+          $ref: "#/components/schemas/OrderStatus"
         user_id:
           type: integer
           format: int32
@@ -1041,9 +1049,7 @@ components:
           type: integer
           format: int32
         status:
-          type: string
-          description: Order status
-          enum: *order_statuses_enum
+          $ref: "#/components/schemas/OrderStatus"
         user_id:
           type: integer
           format: int32

@@ -16,7 +16,6 @@ func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
 	r.Use(middleware.OapiRequestValidator(apiImpl.Swagger))
-	// api.RegisterHandlers(r)
 	api.RegisterHandlersWithOptions(r, floralApi, api.GinServerOptions{
 		ErrorHandler: floralApi.ErrorHandler,
 	})

@@ -1,21 +1,3 @@
--- name: GetProductReview :one
-SELECT
-  r.id,
-  r.user_id,
-  r.product_id,
-  r.rating,
-  r.review_text,
-  r.created,
-  r.modified,
-  (u.first_name || u.last_name) AS "user_name"
-FROM
-  "floral"."review" r
-JOIN
-  "floral"."user" u
-ON
-  r.user_id = u.id
-WHERE r.id = $1;
-
 -- name: GetProductReviews :many
 SELECT
   r.id,
@@ -28,11 +10,13 @@ SELECT
   (u.first_name || u.last_name) AS "user_name"
 FROM
   "floral"."review" r
-JOIN
-  "floral"."user" u
-ON
-  r.user_id = u.id
-WHERE r.product_id = $1;
+JOIN "floral"."user" u ON r.user_id = u.id
+JOIN "floral"."product" p ON r.product_id = p.id
+JOIN "floral"."store" s ON p.store_id = s.id
+WHERE
+  (@is_user_id::bool = true AND r.user_id = @user_id)
+  AND (@is_product_id::bool = true AND r.product_id = @product_id)
+  AND (@is_store_id::bool = true AND s.id = @store_id);
 
 -- name: AddProductReview :one
 INSERT INTO
