@@ -1,4 +1,3 @@
-import { HTTPError } from 'ky';
 import React from 'react';
 import ReactModal from 'react-modal';
 import { useShallow } from 'zustand/react/shallow';
@@ -6,7 +5,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { BlockBtn, BlockInput } from '../generic';
 import { useAuth, useLoginModal } from '../../stores';
 import { api } from '../../api';
-import {Error} from '../../api/types';
+import {alertError} from '../../util/error';
 
 export const Login: React.FC = () => {
   const { isOpen, setIsOpen, email, setEmail, password, setPassword } = useLoginModal(
@@ -26,11 +25,9 @@ export const Login: React.FC = () => {
     try {
       const data = await api.getToken({ email, password });
       setToken(data.token)
+      setIsOpen(false)
     } catch (err) {
-      if (err instanceof HTTPError) {
-        const errorJson: Error = await err.response.json()
-        alert(`Ошибка: ${errorJson.error}`)
-      }
+      alertError(err)
     }
   };
 

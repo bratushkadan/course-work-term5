@@ -26,6 +26,8 @@ export const useSignUpModal = create<{
   setEmail: (email: string) => void
   password: string
   setPassword: (password: string) => void
+  phoneNumber: string
+  setPhoneNumber: (phoneNumber: string) => void
 }>(set => ({
   isOpen: false,
   setIsOpen: (isOpen) => set(() => ({isOpen})),
@@ -37,6 +39,8 @@ export const useSignUpModal = create<{
   setEmail: (email) => set(() => ({email})),
   password: '',
   setPassword: (password) => set(() => ({password})),
+  phoneNumber: '',
+  setPhoneNumber: (phoneNumber) => set(() => ({phoneNumber})),
 }))
 
 

@@ -930,6 +930,7 @@ components:
       required:
         - id
         - store_id
+        - store_name
         - name
         - description
         - image_url
@@ -946,6 +947,8 @@ components:
         store_id:
           type: integer
           format: int32
+        store_name:
+          type: string
         name:
           type: string
         description:
@@ -1185,6 +1188,7 @@ components:
         - id
         - user_id
         - product_id
+        - product_name
         - rating
         - review_text
         - created
@@ -1201,6 +1205,8 @@ components:
         product_id:
           type: integer
           format: int32
+        product_name:
+          type: string
         rating:
           minimum: 1
           maximum: 10

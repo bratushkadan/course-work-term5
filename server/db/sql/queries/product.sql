@@ -2,6 +2,7 @@
 SELECT
   p.id, 
   p.store_id,
+  s.name AS "store_name",
   p.name,
   p.description,
   p.image_url,
@@ -12,12 +13,9 @@ SELECT
   pc.name AS "category_name",
   pc.description AS "category_description",
   p.created
-FROM
-  "floral"."product" p
-JOIN
-  "floral"."product_category" pc
-ON
-  p.category_id = pc.id
+FROM "floral"."product" p
+JOIN "floral"."product_category" pc ON p.category_id = pc.id
+JOIN "floral"."store" s ON p.store_id = s.id
 WHERE
   p.id = $1;
 
@@ -68,6 +66,7 @@ WITH p AS (
   SELECT
     p.id, 
     p.store_id,
+    s.name AS "store_name",
     p.name,
     p.description,
     p.image_url,
@@ -80,10 +79,8 @@ WITH p AS (
     p.created
   FROM
     "floral"."product" p
-  JOIN
-    "floral"."product_category" pc
-  ON
-    p.category_id = pc.id
+  JOIN "floral"."product_category" pc ON p.category_id = pc.id
+  JOIN "floral"."store" s ON p.store_id = s.id
 )
 SELECT
   *
@@ -110,6 +107,7 @@ ORDER BY
 SELECT
   p.id, 
   p.store_id,
+  s.name AS "store_name",
   p.name,
   p.description,
   p.image_url,
@@ -126,6 +124,7 @@ JOIN
   "floral"."product_category" pc
 ON
   p.category_id = pc.id
+JOIN "floral"."store" s ON p.store_id = s.id
 WHERE
   p.store_id = $1;
 

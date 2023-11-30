@@ -55,14 +55,15 @@ func (*Impl) GetV1Reviews(c *gin.Context, params floralApi.GetV1ReviewsParams) {
 	for _, r := range rows {
 		if username, ok := r.UserName.(string); ok {
 			response = append(response, floralApi.Review{
-				Created:    r.Created.Time.UnixMilli(),
-				Id:         r.ID,
-				Modified:   r.Modified.Time.UnixMilli(),
-				ProductId:  r.ProductID,
-				Rating:     r.Rating,
-				ReviewText: r.ReviewText.String,
-				UserId:     r.UserID.Int32,
-				UserName:   username,
+				Created:     r.Created.Time.UnixMilli(),
+				Id:          r.ID,
+				Modified:    r.Modified.Time.UnixMilli(),
+				ProductId:   r.ProductID,
+				ProductName: r.ProductName,
+				Rating:      r.Rating,
+				ReviewText:  r.ReviewText.String,
+				UserId:      r.UserID.Int32,
+				UserName:    username,
 			})
 		} else {
 			fmt.Println(errors.New("failed to convert r.UserName to string, should not happen"))
@@ -133,14 +134,15 @@ func (*Impl) PostV1Reviews(c *gin.Context, params floralApi.PostV1ReviewsParams)
 
 	if username, ok := productReview.UserName.(string); ok {
 		c.JSON(http.StatusOK, floralApi.Review{
-			Created:    productReview.Created.Time.UnixMilli(),
-			Id:         productReview.ID,
-			Modified:   productReview.Modified.Time.UnixMilli(),
-			ProductId:  productReview.ProductID,
-			Rating:     productReview.Rating,
-			ReviewText: productReview.ReviewText.String,
-			UserId:     productReview.UserID.Int32,
-			UserName:   username,
+			Created:     productReview.Created.Time.UnixMilli(),
+			Id:          productReview.ID,
+			Modified:    productReview.Modified.Time.UnixMilli(),
+			ProductId:   productReview.ProductID,
+			ProductName: productReview.ProductName,
+			Rating:      productReview.Rating,
+			ReviewText:  productReview.ReviewText.String,
+			UserId:      productReview.UserID.Int32,
+			UserName:    username,
 		})
 	} else {
 		fmt.Println(errors.New("failed to convert r.UserName to string, should not happen"))
@@ -191,14 +193,15 @@ func (*Impl) PatchV1Reviews(c *gin.Context, params floralApi.PatchV1ReviewsParam
 
 	if username, ok := productReview.UserName.(string); ok {
 		c.JSON(http.StatusOK, floralApi.Review{
-			Created:    productReview.Created.Time.UnixMilli(),
-			Id:         productReview.ID,
-			Modified:   productReview.Modified.Time.UnixMilli(),
-			ProductId:  productReview.ProductID,
-			Rating:     productReview.Rating,
-			ReviewText: productReview.ReviewText.String,
-			UserId:     productReview.UserID.Int32,
-			UserName:   username,
+			Created:     productReview.Created.Time.UnixMilli(),
+			Id:          productReview.ID,
+			Modified:    productReview.Modified.Time.UnixMilli(),
+			ProductId:   productReview.ProductID,
+			ProductName: productReview.ProductName,
+			Rating:      productReview.Rating,
+			ReviewText:  productReview.ReviewText.String,
+			UserId:      productReview.UserID.Int32,
+			UserName:    username,
 		})
 	} else {
 		fmt.Println(errors.New("failed to convert r.UserName to string, should not happen"))

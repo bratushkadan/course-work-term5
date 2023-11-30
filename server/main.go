@@ -26,9 +26,8 @@ func main() {
 func getCors() gin.HandlerFunc {
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
-	config.AllowHeaders = []string{
-		"X-Auth-Token",
-	}
+	config.AllowCredentials = true
+	config.AllowHeaders = []string{"*"}
 	config.AllowMethods = []string{
 		"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD",
 	}

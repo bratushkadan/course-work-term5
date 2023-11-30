@@ -78,6 +78,7 @@ func (*Impl) GetV1Products(c *gin.Context, params floralApi.GetV1ProductsParams)
 			Name:        p.Name,
 			Price:       p.Price,
 			StoreId:     p.StoreID,
+			StoreName:   p.StoreName,
 		}
 		product.Category.Id = p.CategoryID
 		product.Category.Name = p.CategoryName
@@ -131,6 +132,7 @@ func (*Impl) PostV1Products(c *gin.Context) {
 		Name:        createdProduct.Name,
 		Price:       createdProduct.Price,
 		StoreId:     createdProduct.StoreID,
+		StoreName:   createdProduct.StoreName,
 	}
 	productResponse.Category.Id = createdProduct.CategoryID
 	productResponse.Category.Name = createdProduct.CategoryName
@@ -161,6 +163,7 @@ func (*Impl) GetV1ProductsId(c *gin.Context, id int32) {
 		Name:        p.Name,
 		Price:       p.Price,
 		StoreId:     p.StoreID,
+		StoreName:   p.StoreName,
 	}
 	product.Category.Id = p.CategoryID
 	product.Category.Name = p.CategoryName
