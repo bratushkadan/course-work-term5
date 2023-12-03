@@ -90,6 +90,8 @@ export type CartPosition = {
   image_url: string;
   category_id: number;
   category_name: string;
+  store_id: number;
+  store_name: string;
 };
 
 export type ChangeCartPositionPayload = {
@@ -117,12 +119,14 @@ export type Order = {
     image_url: string;
     category_id: number;
     category_name: string;
+    store_id: number;
+    store_name: string;
   }>;
 };
 
 export type OrderInfo = {
   id: number;
-  status: 'created';
+  status: 'created' | 'in_progress' | 'processed' | 'delivery' | 'canceled' | 'completed';
   user_id: number;
   created: number;
   status_modified: number;
@@ -131,6 +135,7 @@ export type OrderInfo = {
 export type Favorite = {
   product_id: number;
   store_id: number;
+  store_name: string;
   name: string;
   description: string;
   image_url: string;
@@ -172,10 +177,10 @@ export type Review = {
 };
 
 export type GetReviewsPayload = {
-  user_id?: number
-  product_id?: number
-  store_id?: number
-}
+  user_id?: number;
+  product_id?: number;
+  store_id?: number;
+};
 
 export type AddReviewPayload = {
   product_id: number;
@@ -194,5 +199,5 @@ export type DeleteFavoriteResponse = {
   /**
    * product_id
    */
-  id: number
-}
+  id: number;
+};

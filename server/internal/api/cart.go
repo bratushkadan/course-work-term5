@@ -44,6 +44,8 @@ func (*Impl) GetV1Cart(c *gin.Context, params floralApi.GetV1CartParams) {
 			Quantity:     r.Quantity,
 			CategoryId:   r.CategoryID.Int32,
 			CategoryName: r.CategoryName,
+			StoreId:      r.StoreID,
+			StoreName:    r.StoreName,
 		})
 	}
 
@@ -68,12 +70,6 @@ func (*Impl) PostV1Cart(c *gin.Context, params floralApi.PostV1CartParams) {
 
 	userId := userClaim.Id
 
-	// row, err := db.NewQueries().UpsertCartPosition(context.Background(), database.UpsertCartPositionParams{
-	// 	UserID:    userId,
-	// 	ProductID: requestBody.ProductId,
-	// 	Quantity:  requestBody.Quantity,
-	// })
-
 	var response floralApi.CartPositionResponse
 
 	if requestBody.Quantity != 0 {
@@ -94,7 +90,7 @@ func (*Impl) PostV1Cart(c *gin.Context, params floralApi.PostV1CartParams) {
 		})
 
 		response.ProductId = resultRow.ProductID
-		response.Quantity = resultRow.Quantity
+		response.Quantity = 0
 	}
 
 	if err != nil {

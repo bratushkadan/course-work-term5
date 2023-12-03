@@ -15,3 +15,10 @@ export const BlockInput = styled.input`
   display: block;
   margin: .5rem 0;
 `
+
+export const BlockSmallerText = styled.div`
+  font-size: .75rem;
+`
+export const BlockSmallText = styled.div`
+  font-size: .5rem;
+`

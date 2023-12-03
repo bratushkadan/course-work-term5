@@ -4,9 +4,9 @@ import { api } from '../api';
 import { Store as StoreComponent } from '../components/stores/Store';
 import { useParams } from 'react-router-dom';
 import { alertError } from '../util/error';
-import { Review } from '../components/reviews/Review';
+import { ReviewComponent } from '../components/reviews/Review';
 
-export const Store: React.FC = () => {
+export const StorePage: React.FC = () => {
   const [store, setStore] = useState<IStore | null>();
   const [storeReviews, setStoreReviews] = useState<IReview[]>([]);
 
@@ -30,7 +30,7 @@ export const Store: React.FC = () => {
           <StoreComponent {...store} />
           <h3>{storeReviews.length === 0 ? 'Отзывов нет' : 'Отзывы на продукцию магазина'}</h3>
           {storeReviews.map((props) => (
-            <Review {...props} key={props.id} isDisplayProductName={true} />
+            <ReviewComponent {...props} key={props.id} isDisplayProductName={true} />
           ))}
         </>
       )}

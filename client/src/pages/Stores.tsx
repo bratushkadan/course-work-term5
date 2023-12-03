@@ -3,7 +3,7 @@ import type {Store as IStore} from '../api/types'
 import {api} from '../api'
 import {Store} from '../components/stores/Store'
 
-export const Stores: React.FC = () => {
+export const StoresPage: React.FC = () => {
   const [stores, setStores] = useState<IStore[]>()
   
   useEffect(() => {
@@ -11,6 +11,6 @@ export const Stores: React.FC = () => {
   }, [])
 
   return <>
-    {stores?.map(props => <Store {...props} key={props.id}/>)}
+    {stores?.map(props => <Store {...props} key={props.id} isWithLinkToStore={true}/>)}
   </>
 }

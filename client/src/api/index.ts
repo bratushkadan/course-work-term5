@@ -23,6 +23,7 @@ import type {
   AddReviewPayload,
   DeleteReviewPayload,
   EditReviewPayload,
+  CartPosition,
 } from './types';
 import { omitFalsy, transformProduct } from './util';
 
@@ -93,11 +94,13 @@ export const api = {
   getCategories,
   getCategory,
   getCart: (token: string) =>
-    v1Api.get('cart', {
-      headers: {
-        [X_AUTH_TOKEN]: token,
-      },
-    }),
+    v1Api
+      .get('cart', {
+        headers: {
+          [X_AUTH_TOKEN]: token,
+        },
+      })
+      .json<CartPosition[]>(),
   changeCartPosition: (token: string, payload: ChangeCartPositionPayload) =>
     v1Api
       .post('cart', {
@@ -141,7 +144,7 @@ export const api = {
       .json<Order>(),
   getFavorites: (token: string) =>
     v1Api
-      .post('favorites', {
+      .get('favorites', {
         headers: {
           [X_AUTH_TOKEN]: token,
         },
@@ -166,23 +169,29 @@ export const api = {
   getReviews: (payload: GetReviewsPayload) =>
     v1Api.get(`reviews?${new URLSearchParams(payload as unknown as URLSearchParams)}`).json<Review[]>(),
   addReview: (token: string, payload: AddReviewPayload) =>
-    v1Api.post(`reviews`, {
-      headers: {
-        [X_AUTH_TOKEN]: token,
-      },
-      json: payload,
-    }),
+    v1Api
+      .post(`reviews`, {
+        headers: {
+          [X_AUTH_TOKEN]: token,
+        },
+        json: payload,
+      })
+      .json<Review>(),
   editReview: (token: string, payload: EditReviewPayload) =>
-    v1Api.patch(`reviews`, {
-      headers: {
-        [X_AUTH_TOKEN]: token,
-      },
-      json: payload,
-    }),
+    v1Api
+      .patch(`reviews`, {
+        headers: {
+          [X_AUTH_TOKEN]: token,
+        },
+        json: payload,
+      })
+      .json<Review>(),
   deleteReview: (token: string, payload: DeleteReviewPayload) =>
-    v1Api.delete(`reviews?product_id=${payload.product_id}`, {
-      headers: {
-        [X_AUTH_TOKEN]: token,
-      },
-    }),
+    v1Api
+      .delete(`reviews?product_id=${payload.product_id}`, {
+        headers: {
+          [X_AUTH_TOKEN]: token,
+        },
+      })
+      .json<{id: number}>(),
 };

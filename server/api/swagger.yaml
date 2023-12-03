@@ -1023,6 +1023,8 @@ components:
       - category
       - category_id
       - category_name
+      - store_id
+      - store_name
       properties:
         product_id:
           type: integer
@@ -1043,6 +1045,11 @@ components:
           type: integer
           format: int32
         category_name:
+          type: string
+        store_id:
+          type: integer
+          format: int32
+        store_name:
           type: string
     OrderPosition:
       type: object

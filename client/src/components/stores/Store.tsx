@@ -3,12 +3,10 @@ import { Link } from 'react-router-dom';
 
 import type { Store as IStore } from '../../api/types';
 
-export const Store: React.FC<IStore> = (props) => {
+export const Store: React.FC<IStore & { isWithLinkToStore?: boolean }> = (props) => {
   return (
     <>
-      <h1>
-        <Link to={`/stores/${props.id}`}>{props.name}</Link>
-      </h1>
+      <h1>{props.isWithLinkToStore ? <Link to={`/stores/${props.id}`}>{props.name}</Link> : props.name}</h1>
       <p>{props.email}</p>
       <p>На Floral с {dayjs(props.created).format('DD.MM.YYYY')}</p>
       <p>

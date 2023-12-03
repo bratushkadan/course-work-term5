@@ -7,17 +7,13 @@ SELECT
   p.price,
   p.image_url,
   p.category_id,
-  pc.name AS "category_name"
-FROM
-  "floral"."cart_position" c
-JOIN
-  "floral"."product" p
-ON
-  c.product_id = p.id
-JOIN
-  "floral"."product_category" pc
-ON
-  p.category_id = pc.id
+  pc.name AS "category_name",
+  s.id AS "store_id",
+  s.name AS "store_name"
+FROM "floral"."cart_position" c
+JOIN "floral"."product" p ON c.product_id = p.id
+JOIN "floral"."product_category" pc ON p.category_id = pc.id
+JOIN "floral"."store" s ON p.store_id = s.id
 WHERE
   c.user_id = $1;
   

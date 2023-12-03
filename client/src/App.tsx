@@ -6,8 +6,14 @@ import { LoginPanel } from './components/LoginPanel';
 import { NavMenu } from './components/NavMenu';
 import { NotFound } from './pages/NotFound';
 import { Catalog } from './pages/Catalog';
-import {Stores} from './pages/Stores';
-import {Store} from './pages/Store';
+import { StoresPage } from './pages/Stores';
+import { StorePage } from './pages/Store';
+import { OrdersPage } from './pages/Orders';
+import { FavoritesPage } from './pages/Favorites';
+import {OrderPage} from './pages/Order';
+import {CartPage} from './pages/Cart';
+import {ProductPage} from './pages/Product';
+import {RequestAppDataComponent} from './components/RequestAppData';
 
 const PageWrapper = styled.div`
   display: flex;
@@ -34,7 +40,7 @@ const PageContent = styled.main`
   flex: 1;
   flex-grow: 1;
   overflow-y: auto;
-  margin-left: .33rem;
+  margin-left: 0.33rem;
 `;
 
 const FooterContent = styled.footer`
@@ -61,6 +67,7 @@ const Root: React.FC<React.PropsWithChildren> = () => {
         <b>Floral</b>
         <span> — Данила Братушка 2023</span> &copy;
       </FooterContent>
+      <RequestAppDataComponent/>
     </PageWrapper>
   );
 };
@@ -72,9 +79,13 @@ export const router = createBrowserRouter([
     element: <Root />,
     children: [
       { path: '', element: <Catalog /> },
-      { path: 'cart', element: null },
-      { path: 'stores', element: <Stores/>},
-      { path: 'stores/:id', element: <Store/>},
+      { path: 'cart', element: <CartPage/> },
+      { path: 'stores', element: <StoresPage /> },
+      { path: 'stores/:id', element: <StorePage /> },
+      { path: 'products/:id', element: <ProductPage /> },
+      { path: 'orders', element: <OrdersPage /> },
+      { path: 'orders/:id', element: <OrderPage /> },
+      { path: 'favorites', element: <FavoritesPage /> },
       { path: '*', element: <NotFound /> },
     ],
   },
