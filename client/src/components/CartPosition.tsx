@@ -14,7 +14,7 @@ export const CartPositionComponent: React.FC<CartPosition> = (props) => {
       <div>{props.description}</div>
       <div>{props.price/100} ₽</div>
       <div>
-        Категория: <Link to={`/?filter.category_id=${props.category_id}`}>{props.category_name}</Link>
+        Категория: <Link to={`/?category_id=${props.category_id}`}>{props.category_name}</Link>
       </div>
       {/* !!! */}
       <BlockSmallerText>Продавец: <Link to={`/stores/${props.store_id}`}>{props.store_name}</Link></BlockSmallerText>

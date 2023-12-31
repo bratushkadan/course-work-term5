@@ -14,7 +14,7 @@ export const OrderProductComponent: React.FC<Order['positions'][number] & { isWi
       <div>{props.description}</div>
       <div>{props.price} ₽</div>
       <div>
-        Категория: <Link to={`/?filter.category_id=${props.category_id}`}>{props.category_name}</Link>
+        Категория: <Link to={`/?category_id=${props.category_id}`}>{props.category_name}</Link>
       </div>
       {/* !!! */}
       <div>

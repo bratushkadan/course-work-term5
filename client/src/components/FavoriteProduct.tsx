@@ -67,7 +67,7 @@ export const FavoriteProductComponent: React.FC<Favorite & { isWithProductLink?:
       <img width={150} height={150} src={props.image_url} alt={props.name} />
       <div>{(props.price / 100)} ₽</div>
       <div>
-        Категория: <Link to={`/?filter.category_id=${props.category_id}`}>{props.category_name}</Link>
+        Категория: <Link to={`/?category_id=${props.category_id}`}>{props.category_name}</Link>
       </div>
       <div>
         Продавец: <Link to={`/stores/${props.store_id}`}>{props.store_name}</Link>

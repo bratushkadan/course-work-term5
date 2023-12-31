@@ -11,11 +11,10 @@ export const CartControls: React.FC<{ product: Product }> = ({ product }) => {
   const token = useAuth((state) => state.token);
   const { cart, setCart } = useCart(useShallow((state) => ({ cart: state.cart, setCart: state.setCart })));
 
-  if (!token) {
-    return null;
-  }
-
   const handleAddToCart = useCallback(() => {
+    if (!token) {
+      return;
+    }
     api
       .changeCartPosition(token, {
         product_id: product.id,
@@ -62,7 +61,11 @@ export const CartControls: React.FC<{ product: Product }> = ({ product }) => {
     [cart, product.id]
   );
   const handleDecrementCartPosition = useCallback(
+    
     (cartPosition: CartPosition) => {
+      if (!token) {
+        return
+      }
       api
         .changeCartPosition(token, {
           product_id: product.id,
@@ -107,11 +110,11 @@ export const FavoriteControls: React.FC<{ product: Product }> = ({ product }) =>
     useShallow(({ favorites, setFavorites }) => ({ favorites, setFavorites }))
   );
 
-  if (!token) {
-    return null;
-  }
-
   const handleAddFavorite = () => {
+    if (!token) {
+      return;
+    }
+
     api
       .addFavorite(token, product.id)
       .then(() => {
@@ -135,6 +138,10 @@ export const FavoriteControls: React.FC<{ product: Product }> = ({ product }) =>
   };
 
   const handleRemoveFavorite = () => {
+    if (!token) {
+      return;
+    }
+
     api
       .deleteFavorite(token, product.id)
       .then((deletedFavorite) => {
@@ -169,9 +176,8 @@ export const ProductComponent: React.FC<
       <div>{props.description}</div>
       <div>{props.price} ₽</div>
       <div>
-        Категория: <Link to={`/?filter.category_id=${props.category.id}`}>{props.category.name}</Link>
+        Категория: <Link to={`/?category_id=${props.category.id}`}>{props.category.name}</Link>
       </div>
-      {/* !!! */}
       <div>
         Продавец: <Link to={`/stores/${props.store_id}`}>{props.store_name}</Link>
       </div>

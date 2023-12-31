@@ -10,7 +10,7 @@ export const Store: React.FC<IStore & { isWithLinkToStore?: boolean }> = (props)
       <p>{props.email}</p>
       <p>На Floral с {dayjs(props.created).format('DD.MM.YYYY')}</p>
       <p>
-        <Link to={`/?filter.store_id=${props.id}`}>Продукция магазина</Link>
+        <Link to={`/?store_id=${props.id}`}>Продукция магазина</Link>
       </p>
     </>
   );
